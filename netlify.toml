@@ -1,0 +1,57 @@
+# Netlify build config for the mfsculpture public site.
+#
+# The deploy ONLY publishes the public-facing files (index.html + data
+# JSON + images). admin.html and server.py are intentionally excluded
+# from the deploy — they have no authentication and would let anyone
+# vandalize the gallery if reachable on the public web. They stay in the
+# repo for local-only editing (`python3 server.py` on your laptop).
+#
+# Build pipeline:
+#   1. Create a clean `dist/` directory
+#   2. Copy ONLY the public files into it
+#   3. Netlify serves `dist/` as the website root
+#
+# If you add new public assets (e.g. a new logo PNG, a CSS file), update
+# the `command` below to include them.
+
+[build]
+  command = """
+    rm -rf dist && \
+    mkdir -p dist && \
+    cp index.html dist/ && \
+    cp gallery.json dist/ && \
+    cp about.json dist/ && \
+    cp hero.json dist/ && \
+    cp -R images dist/
+  """
+  publish = "dist"
+
+# Security headers — minor hardening even on a static site.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Belt-and-suspenders: even if someone somehow gets admin.html into the
+# deploy (e.g. you accidentally copy it in the build command above),
+# this redirect blocks the URL.
+[[redirects]]
+  from = "/admin.html"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/server.py"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# Same protection for design iteration files.
+[[redirects]]
+  from = "/design-*"
+  to = "/404.html"
+  status = 404
+  force = true

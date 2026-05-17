@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Michael Falkson Sculpture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f7f5f2;
+            --white: #ffffff;
+            --ink: #1c1917;
+            --ink-light: #78716c;
+            --ink-faint: #d6d3d1;
+            --rust: #9a3412;
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Outfit', system-ui, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); overflow-x: hidden; }
+
+        /* ─── Nav ─── */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.8rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: transparent; transition: all 0.4s;
+        }
+
+        nav.scrolled {
+            background: rgba(247,245,242,0.95); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--ink-faint); padding: 1.2rem 3rem;
+        }
+
+        .nav-left { display: flex; align-items: baseline; gap: 1rem; }
+
+        .logo {
+            font-family: var(--font-serif); font-size: 1.8rem; font-weight: 300;
+            color: #fff; text-decoration: none; font-style: italic;
+            transition: color 0.4s;
+        }
+        nav.scrolled .logo { color: var(--ink); }
+
+        .logo-sub {
+            font-size: 0.65rem; letter-spacing: 4px; text-transform: uppercase;
+            color: rgba(255,255,255,0.6); font-weight: 500; transition: color 0.4s;
+        }
+        nav.scrolled .logo-sub { color: var(--ink-light); }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.78rem;
+            font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+        nav.scrolled .nav-links a { color: var(--ink-light); }
+        nav.scrolled .nav-links a:hover { color: var(--rust); }
+
+        .hamburger {
+            display: none; flex-direction: column; gap: 5px;
+            cursor: pointer; background: none; border: none; padding: 5px;
+        }
+        .hamburger span { width: 24px; height: 2px; background: #fff; transition: all 0.3s; }
+        nav.scrolled .hamburger span { background: var(--ink); }
+
+        /* ─── Hero — full bleed ─── */
+        .hero { height: 100vh; position: relative; overflow: hidden; }
+
+        .hero-image {
+            position: absolute; inset: 0;
+            background: var(--ink);
+        }
+        .hero-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0.82; }
+
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(28,25,23,0.25) 0%,
+                rgba(28,25,23,0.08) 40%,
+                rgba(28,25,23,0.45) 75%,
+                rgba(28,25,23,0.8) 100%
+            );
+        }
+
+        .hero-content {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 4rem 4rem 5rem; color: #fff;
+        }
+
+        .hero-issue {
+            font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase;
+            color: var(--rust); margin-bottom: 2rem; font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif); font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 300; line-height: 1.08; margin-bottom: 1.5rem;
+            font-style: italic; color: #fff;
+        }
+        .hero h1 strong { font-weight: 600; font-style: normal; }
+
+        .hero-content > p {
+            font-size: 1rem; color: rgba(255,255,255,0.6); line-height: 1.7;
+            max-width: 450px; font-weight: 300;
+        }
+
+        .hero-scroll {
+            position: absolute; bottom: 2rem; right: 4rem;
+            display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+            color: rgba(255,255,255,0.4); font-size: 0.6rem; letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .hero-scroll .line {
+            width: 1px; height: 50px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+        /* ─── Gallery ─── */
+        .gallery-section { padding: 8rem 3rem; }
+
+        .gallery-header {
+            max-width: 1200px; margin: 0 auto 4rem;
+            display: flex; align-items: baseline; gap: 2rem;
+            border-bottom: 1px solid var(--ink-faint); padding-bottom: 1.5rem;
+        }
+        .gallery-header h2 {
+            font-family: var(--font-serif); font-size: 1.2rem; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+        .gallery-header .line { flex: 1; height: 1px; background: var(--ink-faint); }
+
+        .gallery-grid {
+            max-width: 1200px; margin: 0 auto;
+            columns: 3; column-gap: 1.5rem;
+        }
+
+        .gallery-item {
+            break-inside: avoid; margin-bottom: 1.5rem;
+            position: relative; overflow: hidden; cursor: pointer;
+            background: var(--white);
+        }
+        .gallery-item img {
+            width: 100%; display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .gallery-item:hover img { transform: scale(1.03); }
+
+        .gallery-info { padding: 1rem 1.2rem; border-top: 1px solid var(--ink-faint); }
+        .gallery-info h3 { font-family: var(--font-serif); font-size: 1rem; font-weight: 400; font-style: italic; }
+        .gallery-info p { font-size: 0.7rem; color: var(--ink-light); margin-top: 0.2rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .tile-placeholder {
+            aspect-ratio: 3/4; background: var(--ink-faint);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: rgba(0,0,0,0.06);
+        }
+
+        /* ─── Lightbox ─── */
+        .lightbox {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(28, 25, 23, 0.96);
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.35s;
+        }
+        .lightbox.active { display: flex; opacity: 1; }
+
+        .lightbox img { max-width: 88vw; max-height: 85vh; object-fit: contain; }
+
+        .lightbox-close {
+            position: absolute; top: 2rem; right: 2.5rem;
+            background: none; border: none; color: rgba(255,255,255,0.6);
+            font-size: 2rem; cursor: pointer; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.3s;
+        }
+        .lightbox-close:hover { color: #fff; }
+
+        .lightbox-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: none; border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6); font-size: 1.8rem; cursor: pointer;
+            width: 56px; height: 56px; display: flex;
+            align-items: center; justify-content: center;
+            transition: all 0.3s; border-radius: 50%;
+        }
+        .lightbox-nav:hover { border-color: rgba(255,255,255,0.4); color: #fff; background: rgba(255,255,255,0.05); }
+        .lightbox-prev { left: 2rem; }
+        .lightbox-next { right: 2rem; }
+
+        .lightbox-caption {
+            position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+            text-align: center; color: #fff;
+        }
+        .lightbox-caption h3 { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 400; font-style: italic; }
+        .lightbox-caption p { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 0.4rem; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        .lightbox-counter {
+            position: absolute; top: 2.5rem; left: 2.5rem;
+            font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 2px;
+        }
+
+        /* ─── About ─── */
+        .about-section {
+            padding: 8rem 3rem; background: var(--white);
+            border-top: 1px solid var(--ink-faint);
+            border-bottom: 1px solid var(--ink-faint);
+        }
+        .about-inner {
+            max-width: 1000px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.3fr 1fr; gap: 5rem; align-items: center;
+        }
+        .about-text h2 {
+            font-family: var(--font-serif); font-size: 2.5rem; font-weight: 300;
+            font-style: italic; line-height: 1.3; margin-bottom: 2rem;
+        }
+        .about-text p {
+            color: var(--ink-light); line-height: 1.9; font-size: 0.92rem;
+            margin-bottom: 1.2rem; font-weight: 300;
+        }
+        .about-image { aspect-ratio: 3/4; background: var(--ink-faint); overflow: hidden; }
+        .about-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ─── Contact ─── */
+        .contact-section { padding: 8rem 3rem; text-align: center; }
+        .contact-section h2 {
+            font-family: var(--font-serif); font-size: 3rem; font-weight: 300;
+            font-style: italic; margin-bottom: 1.5rem;
+        }
+        .contact-section p { color: var(--ink-light); margin-bottom: 2.5rem; font-weight: 300; }
+
+        .contact-form {
+            max-width: 500px; margin: 0 auto;
+            display: flex; flex-direction: column; gap: 1.2rem;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+        .contact-form input, .contact-form textarea {
+            width: 100%; padding: 14px 16px; background: var(--white);
+            border: 1px solid var(--ink-faint); color: var(--ink);
+            font-family: var(--font-sans); font-size: 0.88rem; font-weight: 300;
+            outline: none; transition: border-color 0.3s;
+        }
+        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--rust); }
+        .contact-form textarea { resize: vertical; min-height: 120px; }
+        .contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--ink-faint); }
+
+        .submit-btn {
+            align-self: flex-start; padding: 1rem 3rem;
+            background: var(--ink); color: var(--bg); border: none;
+            font-family: var(--font-sans); font-size: 0.78rem; font-weight: 500;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover { background: var(--rust); }
+
+        /* ─── Footer ─── */
+        footer {
+            padding: 3rem; display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: var(--ink-light);
+            border-top: 1px solid var(--ink-faint);
+        }
+        footer a { color: var(--ink-light); text-decoration: none; }
+        footer a:hover { color: var(--rust); }
+        .footer-links { display: flex; gap: 2rem; }
+
+        /* ─── Animations ─── */
+        .fade-in { opacity: 0; transform: translateY(25px); transition: opacity 0.8s, transform 0.8s; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            nav { padding: 1.2rem 1.5rem; }
+            nav.scrolled { padding: 1rem 1.5rem; }
+            .nav-links {
+                position: fixed; top: 0; right: -100%; width: 70%; height: 100vh;
+                background: var(--bg); flex-direction: column;
+                justify-content: center; align-items: center; gap: 2rem;
+                transition: right 0.4s; box-shadow: -4px 0 30px rgba(0,0,0,0.1);
+            }
+            .nav-links.open { right: 0; }
+            .nav-links a { color: var(--ink-light) !important; }
+            .hamburger { display: flex; z-index: 101; }
+            .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+            .hero-content { padding: 3rem 2rem 4rem; }
+            .hero-scroll { display: none; }
+            .gallery-section, .about-section, .contact-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+            .gallery-grid { columns: 2; column-gap: 1rem; }
+            .gallery-item { margin-bottom: 1rem; }
+            .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .lightbox-nav { width: 44px; height: 44px; font-size: 1.4rem; }
+            .lightbox-prev { left: 1rem; }
+            .lightbox-next { right: 1rem; }
+        }
+
+        @media (max-width: 480px) { .gallery-grid { columns: 1; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">
+            <a href="#" class="logo" id="logo-display">Michael Falkson</a>
+            <span class="logo-sub">Sculpture</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#gallery">Works</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-image" id="hero-image"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-issue" id="hero-tag-display">Metal Sculpture</p>
+            <h1 id="hero-h1-display">Forged in <strong>Steel</strong></h1>
+            <p id="hero-subtitle-display"></p>
+        </div>
+        <div class="hero-scroll"><span>Scroll</span><div class="line"></div></div>
+    </section>
+
+    <section class="gallery-section" id="gallery">
+        <div class="gallery-header fade-in">
+            <h2>Selected Works</h2>
+            <div class="line"></div>
+        </div>
+        <div class="gallery-grid fade-in" id="gallery-grid"></div>
+    </section>
+
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-counter" id="lightbox-counter"></span>
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)">&#8249;</button>
+        <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)">&#8250;</button>
+        <img src="" alt="" id="lightbox-img">
+        <div class="lightbox-caption">
+            <h3 id="lightbox-title"></h3>
+            <p id="lightbox-material"></p>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-inner fade-in">
+            <div class="about-text">
+                <h2 id="about-headline-display">About the Artist</h2>
+                <p id="about-p1-display">Every sculpture begins as raw material — steel, copper, iron — waiting to be shaped by heat and intention.</p>
+                <p id="about-p2-display">Working from my studio, I combine traditional metalworking techniques with contemporary design to create pieces that live at the intersection of craft and fine art.</p>
+                <p id="about-p3-display"></p>
+            </div>
+            <div class="about-image" id="about-image">
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,0.06);">Artist</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+        <div class="fade-in">
+            <h2>Let's Talk</h2>
+            <p>Interested in a piece or want to discuss a commission?</p>
+            <form class="contact-form" onsubmit="handleSubmit(event)">
+                <div class="form-row">
+                    <input type="text" placeholder="Name" required>
+                    <input type="email" placeholder="Email" required>
+                </div>
+                <input type="text" placeholder="Subject">
+                <textarea placeholder="Message" required></textarea>
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <span>&copy; 2026 Michael Falkson Sculpture</span>
+        <div class="footer-links"><a href="#">Instagram</a><a href="#">Email</a></div>
+    </footer>
+
+    <script>
+        let galleryData = [];
+
+        // ─── Nav ───
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(link =>
+            link.addEventListener('click', () => { hamburger.classList.remove('active'); navLinks.classList.remove('open'); })
+        );
+
+        // ─── Load Hero ───
+        async function loadHero() {
+            try {
+                let data;
+                try { const r = await fetch('/api/hero'); data = await r.json(); }
+                catch { const r = await fetch('hero.json'); data = await r.json(); }
+                if (!data || Object.keys(data).length === 0) return;
+
+                if (data.siteName) {
+                    document.getElementById('logo-display').textContent = data.siteName;
+                    document.getElementById('page-title').textContent = data.siteName;
+                }
+                if (data.tag) document.getElementById('hero-tag-display').textContent = data.tag;
+                if (data.h1Line1 || data.h1Line2) {
+                    const l1 = data.h1Line1 || '', l2 = data.h1Line2 || '';
+                    document.getElementById('hero-h1-display').innerHTML =
+                        l1 + (l2 ? ` <strong>${l2}</strong>` : '');
+                }
+                const sub = document.getElementById('hero-subtitle-display');
+                if (data.subtitle) { sub.textContent = data.subtitle; sub.style.display = ''; }
+                else { sub.style.display = 'none'; }
+            } catch {}
+        }
+
+        // ─── Load Gallery ───
+        async function loadGallery() {
+            try {
+                let items;
+                try { const r = await fetch('/api/gallery'); items = await r.json(); }
+                catch { const r = await fetch('gallery.json'); items = await r.json(); }
+                items.sort((a,b) => a.order - b.order);
+                galleryData = items;
+
+                const grid = document.getElementById('gallery-grid');
+                const heroImg = document.getElementById('hero-image');
+
+                if (items.length > 0) {
+                    heroImg.innerHTML = `<img src="images/${items[0].filename}" alt="${items[0].title}">`;
+
+                    grid.innerHTML = items.map((item, i) => `
+                        <div class="gallery-item" data-index="${i}" data-full="images/${item.filename}">
+                            <img src="images/thumbs/${item.filename}" alt="${item.title}" loading="lazy">
+                            <div class="gallery-info"><h3>${item.title}</h3><p>${item.material}</p></div>
+                        </div>
+                    `).join('');
+                } else {
+                    heroImg.style.background = 'linear-gradient(135deg, #1c1917, #3d3530)';
+                    const shapes = ['&#9670;','&#9674;','&#9651;','&#9671;','&#9675;','&#9645;'];
+                    grid.innerHTML = shapes.map((s,i) => `
+                        <div class="gallery-item"><div class="tile-placeholder">${s}</div>
+                        <div class="gallery-info"><h3>Sculpture ${i+1}</h3><p>Metal</p></div></div>
+                    `).join('');
+                }
+                initLightbox();
+            } catch {
+                document.getElementById('hero-image').style.background = 'linear-gradient(135deg, #1c1917, #3d3530)';
+            }
+            initScrollAnimations();
+        }
+
+        // ─── Load About ───
+        async function loadAbout() {
+            try {
+                let data;
+                try { const r = await fetch('/api/about'); data = await r.json(); }
+                catch { const r = await fetch('about.json'); data = await r.json(); }
+                if (!data || Object.keys(data).length === 0) return;
+
+                if (data.headline) document.getElementById('about-headline-display').innerHTML = data.headline.replace(/,\s*/g, ',<br>');
+                if (data.p1) document.getElementById('about-p1-display').textContent = data.p1;
+                if (data.p2) document.getElementById('about-p2-display').textContent = data.p2;
+                if (data.p3) document.getElementById('about-p3-display').textContent = data.p3;
+                if (data.artistPhoto) {
+                    document.getElementById('about-image').innerHTML = `<img src="images/${data.artistPhoto}?t=${Date.now()}" alt="The Artist">`;
+                }
+            } catch {}
+        }
+
+        // ─── Lightbox ───
+        let currentIndex = 0;
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxMaterial = document.getElementById('lightbox-material');
+        const lightboxCounter = document.getElementById('lightbox-counter');
+
+        function initLightbox() {
+            document.querySelectorAll('.gallery-item[data-index]').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentIndex = parseInt(item.dataset.index);
+                    openLightbox(currentIndex);
+                });
+            });
+        }
+
+        function openLightbox(index) {
+            if (!galleryData[index]) return;
+            const item = galleryData[index];
+            lightboxImg.src = `images/${item.filename}`;
+            lightboxTitle.textContent = item.title;
+            lightboxMaterial.textContent = item.material;
+            lightboxCounter.textContent = `${index + 1} / ${galleryData.length}`;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function navigateLightbox(dir) {
+            currentIndex = (currentIndex + dir + galleryData.length) % galleryData.length;
+            openLightbox(currentIndex);
+        }
+
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+
+        // ─── Scroll animations ───
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }
+
+        // ─── Form ───
+        function handleSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('.submit-btn');
+            btn.textContent = 'Message Sent!'; btn.style.background = 'var(--rust)';
+            setTimeout(() => { btn.textContent = 'Send Message'; btn.style.background = ''; e.target.reset(); }, 3000);
+        }
+
+        // ─── Init ───
+        loadHero();
+        loadGallery();
+        loadAbout();
+    </script>
+</body>
+</html>

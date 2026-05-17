@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MF Sculpture — Gallery Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1c1c1c;
+            --accent: #c4873b;
+            --accent-dim: rgba(196, 135, 59, 0.15);
+            --text: #e8e8e8;
+            --text-muted: #888;
+            --danger: #c44b3b;
+            --success: #3bc46b;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+            --radius: 8px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .admin-header .left { display: flex; align-items: center; gap: 1.2rem; }
+
+        .admin-header .logo {
+            font-family: var(--font-display);
+            font-size: 1.3rem; font-weight: 900; letter-spacing: 2px;
+        }
+
+        .admin-header .logo span { color: var(--accent); }
+
+        .admin-header .badge {
+            font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--accent); background: var(--accent-dim);
+            padding: 4px 10px; border-radius: 3px; font-weight: 600;
+        }
+
+        .admin-header .actions { display: flex; gap: 0.8rem; }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: transparent; color: var(--text);
+            font-family: var(--font-body); font-size: 0.78rem;
+            letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500;
+            cursor: pointer; border-radius: var(--radius);
+            transition: all 0.3s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+
+        .btn:hover { border-color: rgba(255,255,255,0.3); background: var(--surface-2); }
+
+        .btn-primary { border-color: var(--accent); color: var(--accent); }
+        .btn-primary:hover { background: var(--accent); color: var(--bg); }
+
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        .btn-sm { padding: 6px 14px; font-size: 0.7rem; }
+
+        .main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        /* Stats */
+        .stats-bar { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 1.2rem 1.5rem; flex: 1;
+        }
+
+        .stat-card .value {
+            font-family: var(--font-display);
+            font-size: 1.8rem; font-weight: 700; color: var(--accent);
+        }
+
+        .stat-card .label {
+            font-size: 0.72rem; color: var(--text-muted);
+            letter-spacing: 1.5px; text-transform: uppercase; margin-top: 0.2rem;
+        }
+
+        /* Upload */
+        .upload-zone {
+            border: 2px dashed rgba(196, 135, 59, 0.3);
+            border-radius: var(--radius); padding: 3rem; text-align: center;
+            margin-bottom: 2rem; transition: all 0.3s; cursor: pointer;
+            background: var(--surface);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent); background: var(--accent-dim);
+        }
+
+        .upload-zone .icon { font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.5; }
+
+        .upload-zone h3 {
+            font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.4rem;
+        }
+
+        .upload-zone p { font-size: 0.85rem; color: var(--text-muted); }
+        .upload-zone input { display: none; }
+
+        /* Grid */
+        .section-title {
+            font-family: var(--font-display); font-size: 1.3rem;
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;
+        }
+
+        .section-title .count {
+            font-family: var(--font-body); font-size: 0.7rem;
+            color: var(--text-muted); background: var(--surface-2);
+            padding: 3px 10px; border-radius: 20px;
+        }
+
+        .gallery-admin-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem; margin-bottom: 2rem;
+        }
+
+        .gallery-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); overflow: hidden;
+            transition: all 0.3s; position: relative;
+        }
+
+        .gallery-card:hover {
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        .gallery-card.dragging {
+            opacity: 0.5; border-color: var(--accent); transform: scale(0.97);
+        }
+
+        .gallery-card .drag-handle {
+            position: absolute; top: 0.6rem; left: 0.6rem; z-index: 10;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            border: none; color: var(--text-muted);
+            width: 32px; height: 32px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: grab; font-size: 1rem; transition: color 0.3s;
+        }
+
+        .gallery-card .drag-handle:hover { color: var(--accent); }
+
+        .gallery-card .order-badge {
+            position: absolute; top: 0.6rem; right: 0.6rem; z-index: 10;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            color: var(--accent); width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; font-weight: 600;
+        }
+
+        .gallery-card .card-image {
+            aspect-ratio: 4/3; overflow: hidden; background: var(--surface-2);
+        }
+
+        .gallery-card .card-image img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .gallery-card .card-body { padding: 1rem; }
+        .card-body .field { margin-bottom: 0.8rem; }
+
+        .card-body .field label {
+            display: block; font-size: 0.65rem; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 0.3rem; font-weight: 500;
+        }
+
+        .card-body .field input {
+            width: 100%; background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.08); color: var(--text);
+            padding: 8px 12px; font-family: var(--font-body); font-size: 0.85rem;
+            border-radius: 5px; outline: none; transition: border-color 0.3s;
+        }
+
+        .card-body .field input:focus { border-color: var(--accent); }
+
+        .card-actions { padding: 0 1rem 1rem; display: flex; gap: 0.5rem; }
+
+        .empty-state {
+            text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+        }
+
+        .empty-state .icon { font-size: 3rem; opacity: 0.3; margin-bottom: 1rem; }
+
+        .empty-state h3 {
+            font-family: var(--font-display); color: var(--text); margin-bottom: 0.5rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius); padding: 1rem 1.5rem; font-size: 0.85rem;
+            display: flex; align-items: center; gap: 0.8rem;
+            animation: slideIn 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast.info { border-left: 3px solid var(--accent); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 5000;
+            background: rgba(0,0,0,0.8); display: none;
+            align-items: center; justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius); padding: 2rem;
+            max-width: 420px; width: 90%; text-align: center;
+        }
+
+        .modal h3 { font-family: var(--font-display); margin-bottom: 0.8rem; }
+
+        .modal p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        .modal .modal-actions { display: flex; gap: 0.8rem; justify-content: center; }
+
+        /* About Editor */
+        .about-editor {
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem;
+        }
+
+        .about-editor .field { margin-bottom: 1.2rem; }
+
+        .about-editor label {
+            display: block; font-size: 0.7rem; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 0.4rem; font-weight: 500;
+        }
+
+        .about-editor input, .about-editor textarea {
+            width: 100%; background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.08); color: var(--text);
+            padding: 10px 14px; font-family: var(--font-body); font-size: 0.9rem;
+            border-radius: 5px; outline: none; transition: border-color 0.3s;
+        }
+
+        .about-editor input:focus, .about-editor textarea:focus { border-color: var(--accent); }
+
+        .about-editor textarea { min-height: 100px; resize: vertical; }
+
+        .about-editor .stat-fields {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex; margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem; background: none; border: none;
+            color: var(--text-muted); font-family: var(--font-body);
+            font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s;
+            border-bottom: 2px solid transparent; font-weight: 500;
+        }
+
+        .tab:hover { color: var(--text); }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 768px) {
+            .admin-header { padding: 1rem; flex-wrap: wrap; gap: 0.8rem; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-card { min-width: 140px; }
+            .main { padding: 1.5rem 1rem; }
+            .gallery-admin-grid { grid-template-columns: 1fr 1fr; }
+            .about-editor .stat-fields { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-admin-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header">
+        <div class="left">
+            <div class="logo">MF<span>.</span></div>
+            <span class="badge">Admin</span>
+        </div>
+        <div class="actions">
+            <button class="btn btn-sm" onclick="regenThumbnails()" title="Re-generate all thumbnails from full-res images">&#8635; Regen Thumbs</button>
+            <a href="index.html" class="btn btn-sm" target="_blank">&#9656; Preview Site</a>
+            <button class="btn btn-sm btn-primary" onclick="saveAll()">&#10003; Save All</button>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="value" id="photo-count">0</div>
+                <div class="label">Photos</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="file-count">0</div>
+                <div class="label">Image Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="last-saved">Never</div>
+                <div class="label">Last Saved</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="gallery-tab">Gallery</button>
+            <button class="tab" data-tab="landing-tab">Landing Page</button>
+            <button class="tab" data-tab="about-tab">About / Bio</button>
+        </div>
+
+        <div class="tab-content active" id="gallery-tab">
+            <div class="upload-zone" id="upload-zone">
+                <div class="icon">&#9650;</div>
+                <h3>Drop photos here</h3>
+                <p>Click to select multiple files — drag &amp; drop also works (one at a time from Apple Photos)</p>
+                <input type="file" id="file-input" multiple accept="image/*">
+            </div>
+
+            <h3 class="section-title">
+                Your Sculptures
+                <span class="count" id="grid-count">0 items</span>
+            </h3>
+
+            <div class="gallery-admin-grid" id="admin-grid"></div>
+
+            <div class="empty-state" id="empty-state">
+                <div class="icon">&#9670;</div>
+                <h3>No sculptures yet</h3>
+                <p>Upload your first photo above to get started.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="landing-tab">
+            <div class="about-editor">
+                <h3 class="section-title" style="margin-bottom: 1.5rem;">Edit Landing Page</h3>
+                <div class="field">
+                    <label>Site Name (nav logo &amp; browser tab)</label>
+                    <input type="text" id="hero-site-name" placeholder="e.g. Michael Falkson">
+                </div>
+                <div class="field">
+                    <label>Top Tag Line</label>
+                    <input type="text" id="hero-tag" placeholder="e.g. Metal Sculpture">
+                </div>
+                <div class="field">
+                    <label>Main Heading (line 1)</label>
+                    <input type="text" id="hero-h1-line1" placeholder="e.g. Forged in">
+                </div>
+                <div class="field">
+                    <label>Main Heading (line 2 — outlined style)</label>
+                    <input type="text" id="hero-h1-line2" placeholder="e.g. Steel">
+                </div>
+                <div class="field">
+                    <label>Subtitle (leave blank to hide)</label>
+                    <textarea id="hero-subtitle" placeholder="Optional subtitle text below the heading"></textarea>
+                </div>
+                <div class="field">
+                    <label>Button Text</label>
+                    <input type="text" id="hero-cta" placeholder="e.g. View the Work">
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="saveAll()">&#10003; Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="about-tab">
+            <div class="about-editor">
+                <h3 class="section-title" style="margin-bottom: 1.5rem;">Edit About Section</h3>
+                <div class="field">
+                    <label>Headline</label>
+                    <input type="text" id="about-headline" placeholder="e.g. Shaping Metal, Telling Stories">
+                </div>
+                <div class="field">
+                    <label>Paragraph 1</label>
+                    <textarea id="about-p1" placeholder="Your main artist statement..."></textarea>
+                </div>
+                <div class="field">
+                    <label>Paragraph 2</label>
+                    <textarea id="about-p2" placeholder="More about your process..."></textarea>
+                </div>
+                <div class="field">
+                    <label>Paragraph 3</label>
+                    <textarea id="about-p3" placeholder="Additional details..."></textarea>
+                </div>
+                <h3 class="section-title" style="margin-top: 2rem; margin-bottom: 1rem;">Artist Photo</h3>
+                <div class="field">
+                    <div id="artist-photo-preview" style="width: 200px; aspect-ratio: 3/4; background: var(--surface-2); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem;">
+                        No photo set
+                    </div>
+                    <input type="file" id="artist-photo-input" accept="image/*" style="display:none">
+                    <button class="btn btn-sm" onclick="document.getElementById('artist-photo-input').click()">Choose Photo</button>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="saveAll()">&#10003; Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h3>Delete Sculpture?</h3>
+            <p>This will permanently remove this item and its image file.</p>
+            <div class="modal-actions">
+                <button class="btn btn-sm" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-sm btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // ─── State ───
+        let galleryItems = [];
+        let deleteTargetId = null;
+
+        // ─── API Helpers ───
+        async function apiGet(path) {
+            const res = await fetch(path);
+            return res.json();
+        }
+
+        async function apiPost(path, data) {
+            const res = await fetch(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Server error ${res.status}: ${text}`);
+            }
+            return res.json();
+        }
+
+        async function apiDelete(path) {
+            const res = await fetch(path, { method: 'DELETE' });
+            return res.json();
+        }
+
+        // ─── Upload ───
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault(); uploadZone.classList.add('dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault(); uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => {
+            const filesCopy = Array.from(e.target.files);  // snapshot before clearing
+            e.target.value = '';
+            handleFiles(filesCopy);
+        });
+
+        async function handleFiles(files) {
+            const maxSize = 20 * 1024 * 1024;  // 20MB to handle full-res originals
+            let added = 0;
+            const totalFiles = files.length;
+
+            if (totalFiles > 1) {
+                showToast(`Processing ${totalFiles} images...`);
+            }
+
+            for (const file of files) {
+                // Accept any image type (including HEIC from Apple Photos)
+                if (!file.type.startsWith('image/')) {
+                    showToast(`Skipped ${file.name} — not an image (${file.type || 'unknown type'})`, 'error');
+                    continue;
+                }
+                if (file.size > maxSize) {
+                    showToast(`Skipped ${file.name} — exceeds 20MB`, 'error');
+                    continue;
+                }
+
+                try {
+                    showToast(`Processing ${file.name} (${added + 1}/${totalFiles})...`);
+
+                    const dataUrl = await readFileAsDataURL(file);
+                    const fullRes = await resizeImage(dataUrl, 3200, 0.92);           // high quality full-res
+                    const thumb = await resizeImage(dataUrl, 800, 0.80, true);    // always re-encode thumbnail
+
+                    const nameBase = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+                    const title = nameBase.charAt(0).toUpperCase() + nameBase.slice(1);
+
+                    // Upload to server — saves both full-res and thumbnail as real files
+                    const result = await apiPost('/api/upload', {
+                        fullData: fullRes,
+                        thumbData: thumb,
+                        title: title,
+                        material: 'Metal'
+                    });
+
+                    if (result.id) {
+                        galleryItems.push(result);
+                        added++;
+                    } else {
+                        showToast(`Failed to upload ${file.name}`, 'error');
+                    }
+                } catch (err) {
+                    console.error(`Error processing ${file.name}:`, err);
+                    showToast(`Error on ${file.name}: ${err.message}`, 'error');
+                }
+            }
+
+            if (added > 0) {
+                showToast(`Added ${added} photo${added > 1 ? 's' : ''} — saved as files!`, 'success');
+                renderGrid();
+                updateStats();
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function resizeImage(dataUrl, maxDimension, quality = 0.85, forceReencode = false) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        let { width, height } = img;
+                        // Only skip if image is small enough AND we don't need to re-encode
+                        if (!forceReencode && width <= maxDimension && height <= maxDimension) {
+                            resolve(dataUrl); return;
+                        }
+                        // Scale down if exceeds max
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = Math.round((height / width) * maxDimension); width = maxDimension;
+                            } else {
+                                width = Math.round((width / height) * maxDimension); height = maxDimension;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = dataUrl;
+            });
+        }
+
+        // ─── Grid ───
+        function renderGrid() {
+            const grid = document.getElementById('admin-grid');
+            const empty = document.getElementById('empty-state');
+
+            galleryItems.sort((a, b) => a.order - b.order);
+
+            if (galleryItems.length === 0) {
+                grid.innerHTML = ''; empty.style.display = 'block'; return;
+            }
+
+            empty.style.display = 'none';
+            grid.innerHTML = galleryItems.map((item, idx) => `
+                <div class="gallery-card" draggable="true" data-id="${item.id}" data-index="${idx}">
+                    <div class="drag-handle" title="Drag to reorder">&#9783;</div>
+                    <div class="order-badge">${idx + 1}</div>
+                    <div class="card-image">
+                        <img src="/images/thumbs/${item.filename}" alt="${item.title}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <div class="field">
+                            <label>Title</label>
+                            <input type="text" value="${escapeHtml(item.title)}"
+                                   onchange="updateField('${item.id}', 'title', this.value)">
+                        </div>
+                        <div class="field">
+                            <label>Material / Medium</label>
+                            <input type="text" value="${escapeHtml(item.material)}"
+                                   onchange="updateField('${item.id}', 'material', this.value)">
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-sm" onclick="moveItem('${item.id}', -1)">&#8593; Up</button>
+                        <button class="btn btn-sm" onclick="moveItem('${item.id}', 1)">&#8595; Down</button>
+                        <button class="btn btn-sm btn-danger" onclick="promptDelete('${item.id}')">&#10005;</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('grid-count').textContent =
+                `${galleryItems.length} item${galleryItems.length !== 1 ? 's' : ''}`;
+            initDragAndDrop();
+        }
+
+        function escapeHtml(str) {
+            const el = document.createElement('span');
+            el.textContent = str || ''; return el.innerHTML;
+        }
+
+        function updateField(id, field, value) {
+            const item = galleryItems.find(i => i.id === id);
+            if (item) item[field] = value;
+        }
+
+        function moveItem(id, direction) {
+            const idx = galleryItems.findIndex(i => i.id === id);
+            const newIdx = idx + direction;
+            if (newIdx < 0 || newIdx >= galleryItems.length) return;
+            [galleryItems[idx], galleryItems[newIdx]] = [galleryItems[newIdx], galleryItems[idx]];
+            galleryItems.forEach((item, i) => item.order = i);
+            renderGrid();
+        }
+
+        // ─── Drag and Drop ───
+        let dragSrcIndex = null;
+
+        function initDragAndDrop() {
+            document.querySelectorAll('.gallery-card').forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    dragSrcIndex = parseInt(card.dataset.index);
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                card.addEventListener('dragend', () => card.classList.remove('dragging'));
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+                });
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const dropIndex = parseInt(card.dataset.index);
+                    if (dragSrcIndex === null || dragSrcIndex === dropIndex) return;
+                    const [moved] = galleryItems.splice(dragSrcIndex, 1);
+                    galleryItems.splice(dropIndex, 0, moved);
+                    galleryItems.forEach((item, i) => item.order = i);
+                    renderGrid();
+                    showToast('Order updated', 'info');
+                });
+            });
+        }
+
+        // ─── Delete ───
+        function promptDelete(id) {
+            deleteTargetId = id;
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            deleteTargetId = null;
+            document.getElementById('delete-modal').classList.remove('active');
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!deleteTargetId) return;
+            await apiDelete(`/api/gallery/${deleteTargetId}`);
+            galleryItems = galleryItems.filter(i => i.id !== deleteTargetId);
+            galleryItems.forEach((item, i) => item.order = i);
+            closeDeleteModal();
+            renderGrid();
+            updateStats();
+            showToast('Photo removed (file deleted)', 'success');
+        });
+
+        // ─── Save All ───
+        async function regenThumbnails() {
+            if (galleryItems.length === 0) {
+                showToast('No images to regenerate', 'error'); return;
+            }
+            showToast(`Regenerating ${galleryItems.length} thumbnails...`);
+            let done = 0;
+            for (const item of galleryItems) {
+                try {
+                    // Load the full-res image from the server
+                    const fullUrl = `/images/${item.filename}`;
+                    const response = await fetch(fullUrl);
+                    const blob = await response.blob();
+                    const dataUrl = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                    // Create 800px thumbnail
+                    const thumb = await resizeImage(dataUrl, 800, 0.80, true);
+                    // Upload just the thumbnail
+                    await apiPost('/api/regen-thumb', {
+                        filename: item.filename,
+                        thumbData: thumb
+                    });
+                    done++;
+                } catch (err) {
+                    console.error(`Failed to regen thumb for ${item.filename}:`, err);
+                }
+            }
+            showToast(`Regenerated ${done}/${galleryItems.length} thumbnails!`, 'success');
+        }
+
+        // ─── Artist Photo ───
+        document.getElementById('artist-photo-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            e.target.value = '';
+            try {
+                showToast(`Uploading artist photo (${(file.size/1024).toFixed(0)}KB)...`);
+                const dataUrl = await readFileAsDataURL(file);
+                const imageData = dataUrl;  // send full quality, no resize
+                const result = await apiPost('/api/artist-photo', { imageData: imageData });
+                if (result.filename) {
+                    const preview = document.getElementById('artist-photo-preview');
+                    preview.innerHTML = `<img src="/images/${result.filename}?t=${Date.now()}" style="width:100%;height:100%;object-fit:cover;">`;
+                    showToast('Artist photo updated!', 'success');
+                } else {
+                    showToast('Upload returned no filename: ' + JSON.stringify(result), 'error');
+                }
+            } catch (err) {
+                console.error('Artist photo upload error:', err);
+                showToast('Failed: ' + err.message, 'error');
+            }
+        });
+
+        async function saveAll() {
+            try {
+                // Save gallery order & metadata
+                await apiPost('/api/gallery', galleryItems);
+
+                // Save hero/landing data
+                await apiPost('/api/hero', {
+                    siteName: document.getElementById('hero-site-name').value,
+                    tag: document.getElementById('hero-tag').value,
+                    h1Line1: document.getElementById('hero-h1-line1').value,
+                    h1Line2: document.getElementById('hero-h1-line2').value,
+                    subtitle: document.getElementById('hero-subtitle').value,
+                    cta: document.getElementById('hero-cta').value,
+                });
+
+                // Save about data
+                await apiPost('/api/about', {
+                    headline: document.getElementById('about-headline').value,
+                    p1: document.getElementById('about-p1').value,
+                    p2: document.getElementById('about-p2').value,
+                    p3: document.getElementById('about-p3').value,
+                });
+
+                document.getElementById('last-saved').textContent = new Date().toLocaleTimeString();
+                showToast('All changes saved!', 'success');
+            } catch (err) {
+                showToast('Save failed: ' + err.message, 'error');
+            }
+        }
+
+        // ─── Stats ───
+        function updateStats() {
+            document.getElementById('photo-count').textContent = galleryItems.length;
+            document.getElementById('file-count').textContent = galleryItems.length;
+        }
+
+        // ─── Toast ───
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '&#10003;', error: '&#10007;', info: '&#9432;' };
+            toast.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ─── Tabs ───
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ─── Init ───
+        async function init() {
+            try {
+                galleryItems = await apiGet('/api/gallery');
+                renderGrid();
+                updateStats();
+
+                // Load hero data
+                const hero = await apiGet('/api/hero');
+                if (hero) {
+                    document.getElementById('hero-site-name').value = hero.siteName || '';
+                    document.getElementById('hero-tag').value = hero.tag || '';
+                    document.getElementById('hero-h1-line1').value = hero.h1Line1 || '';
+                    document.getElementById('hero-h1-line2').value = hero.h1Line2 || '';
+                    document.getElementById('hero-subtitle').value = hero.subtitle || '';
+                    document.getElementById('hero-cta').value = hero.cta || '';
+                }
+
+                // Load about data
+                const about = await apiGet('/api/about');
+                if (about) {
+                    document.getElementById('about-headline').value = about.headline || '';
+                    document.getElementById('about-p1').value = about.p1 || '';
+                    document.getElementById('about-p2').value = about.p2 || '';
+                    document.getElementById('about-p3').value = about.p3 || '';
+                    if (about.artistPhoto) {
+                        const preview = document.getElementById('artist-photo-preview');
+                        preview.innerHTML = `<img src="/images/${about.artistPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+                    }
+                }
+            } catch (err) {
+                showToast('Could not connect to server. Make sure server.py is running.', 'error');
+            }
+        }
+
+        init();
+    </script>
+
+</body>
+</html>

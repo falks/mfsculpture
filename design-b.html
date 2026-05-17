@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design B — Editorial / Magazine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f7f5f2;
+            --white: #ffffff;
+            --ink: #1c1917;
+            --ink-light: #78716c;
+            --ink-faint: #d6d3d1;
+            --rust: #9a3412;
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Outfit', system-ui, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); }
+
+        /* ─── Nav ─── */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.8rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(247,245,242,0.92); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--ink-faint);
+        }
+
+        .nav-left { display: flex; align-items: baseline; gap: 1rem; }
+
+        .logo {
+            font-family: var(--font-serif); font-size: 1.8rem; font-weight: 300;
+            color: var(--ink); text-decoration: none; font-style: italic;
+        }
+
+        .logo-sub {
+            font-size: 0.65rem; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--ink-light); font-weight: 500;
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            color: var(--ink-light); text-decoration: none; font-size: 0.78rem;
+            font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--rust); }
+
+        /* ─── Hero — editorial spread ─── */
+        .hero {
+            min-height: 100vh; display: grid;
+            grid-template-columns: 1fr 1fr; padding-top: 80px;
+        }
+
+        .hero-text {
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 6rem 5rem;
+        }
+
+        .hero-issue {
+            font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase;
+            color: var(--rust); margin-bottom: 3rem; font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif); font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 300; line-height: 1.1; margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .hero h1 strong { font-weight: 600; font-style: normal; }
+
+        .hero-text > p {
+            font-size: 0.95rem; color: var(--ink-light); line-height: 1.8;
+            max-width: 400px; font-weight: 300;
+        }
+
+        .hero-visual {
+            background: var(--ink-faint); display: flex;
+            align-items: center; justify-content: center;
+            font-family: var(--font-serif); font-size: 4rem; color: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .hero-visual img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ─── Gallery — mixed masonry ─── */
+        .gallery-section { padding: 8rem 3rem; }
+
+        .gallery-header {
+            max-width: 1200px; margin: 0 auto 5rem;
+            display: flex; align-items: baseline; gap: 2rem;
+            border-bottom: 1px solid var(--ink-faint); padding-bottom: 1.5rem;
+        }
+
+        .gallery-header h2 {
+            font-family: var(--font-serif); font-size: 1.2rem; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .gallery-header .line { flex: 1; height: 1px; background: var(--ink-faint); }
+
+        .gallery-grid {
+            max-width: 1200px; margin: 0 auto;
+            columns: 3; column-gap: 1.5rem;
+        }
+
+        .gallery-item {
+            break-inside: avoid; margin-bottom: 1.5rem;
+            position: relative; overflow: hidden; cursor: pointer;
+            background: var(--white);
+        }
+
+        .gallery-item img {
+            width: 100%; display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gallery-item:hover img { transform: scale(1.03); }
+
+        .gallery-info {
+            padding: 1rem 1.2rem;
+            border-top: 1px solid var(--ink-faint);
+        }
+
+        .gallery-info h3 {
+            font-family: var(--font-serif); font-size: 1rem; font-weight: 400;
+            font-style: italic;
+        }
+
+        .gallery-info p {
+            font-size: 0.7rem; color: var(--ink-light); margin-top: 0.2rem;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* placeholder */
+        .tile-placeholder {
+            aspect-ratio: 3/4; background: var(--ink-faint);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: rgba(0,0,0,0.06);
+        }
+        .tile-placeholder.wide { aspect-ratio: 4/3; }
+        .tile-placeholder.square { aspect-ratio: 1/1; }
+
+        /* ─── About — editorial feature ─── */
+        .about-section {
+            padding: 8rem 3rem; background: var(--white);
+            border-top: 1px solid var(--ink-faint);
+            border-bottom: 1px solid var(--ink-faint);
+        }
+
+        .about-inner {
+            max-width: 1000px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.3fr 1fr; gap: 5rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-family: var(--font-serif); font-size: 2.5rem; font-weight: 300;
+            font-style: italic; line-height: 1.3; margin-bottom: 2rem;
+        }
+
+        .about-text p {
+            color: var(--ink-light); line-height: 1.9; font-size: 0.92rem;
+            margin-bottom: 1.2rem; font-weight: 300;
+        }
+
+        .about-text .pull-quote {
+            font-family: var(--font-serif); font-size: 1.4rem; font-style: italic;
+            color: var(--rust); line-height: 1.5; margin: 2rem 0;
+            padding-left: 1.5rem; border-left: 2px solid var(--rust);
+        }
+
+        .about-image {
+            aspect-ratio: 3/4; background: var(--ink-faint); overflow: hidden;
+        }
+        .about-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ─── Contact ─── */
+        .contact-section { padding: 8rem 3rem; text-align: center; }
+
+        .contact-section h2 {
+            font-family: var(--font-serif); font-size: 3rem; font-weight: 300;
+            font-style: italic; margin-bottom: 1.5rem;
+        }
+
+        .contact-section p { color: var(--ink-light); margin-bottom: 2.5rem; font-weight: 300; }
+
+        .contact-btn {
+            display: inline-block; padding: 1rem 3rem;
+            background: var(--ink); color: var(--bg);
+            text-decoration: none; font-size: 0.78rem; font-weight: 500;
+            letter-spacing: 2px; text-transform: uppercase; transition: background 0.3s;
+        }
+        .contact-btn:hover { background: var(--rust); }
+
+        /* ─── Footer ─── */
+        footer {
+            padding: 3rem; display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: var(--ink-light);
+            border-top: 1px solid var(--ink-faint);
+        }
+        footer a { color: var(--ink-light); text-decoration: none; }
+        footer a:hover { color: var(--rust); }
+        .footer-links { display: flex; gap: 2rem; }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero-visual { min-height: 50vh; }
+            .hero-text { padding: 4rem 2rem; }
+            .gallery-grid { columns: 2; }
+            .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+            nav, .gallery-section, .about-section, .contact-section, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+
+        @media (max-width: 480px) { .gallery-grid { columns: 1; } }
+
+        .design-label {
+            position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+            background: var(--rust); color: #fff; padding: 0.5rem 1.5rem;
+            font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+            z-index: 200; font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="design-label">Design B — Editorial / Magazine</div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="#" class="logo">Michael Falkson</a>
+            <span class="logo-sub">Sculpture</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#gallery">Works</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <p class="hero-issue">Metal Sculpture</p>
+            <h1>Forged in <strong>Steel</strong></h1>
+            <p>Sculpture that explores the tension between industrial strength and organic form.</p>
+        </div>
+        <div class="hero-visual" id="hero-image">&#9670;</div>
+    </section>
+
+    <section class="gallery-section" id="gallery">
+        <div class="gallery-header">
+            <h2>Selected Works</h2>
+            <div class="line"></div>
+        </div>
+        <div class="gallery-grid" id="gallery-grid">
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-inner">
+            <div class="about-text">
+                <h2>About the Artist</h2>
+                <p>Every sculpture begins as raw material — steel, copper, iron — waiting to be shaped by heat and intention.</p>
+                <div class="pull-quote">"My work explores the tension between industrial strength and organic form."</div>
+                <p>Working from my studio, I combine traditional metalworking techniques with contemporary design to create pieces that live at the intersection of craft and fine art.</p>
+            </div>
+            <div class="about-image" id="about-image">
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:rgba(0,0,0,0.06);">Artist</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+        <h2>Let's Talk</h2>
+        <p>Interested in a piece or want to discuss a commission?</p>
+        <a href="mailto:hello@example.com" class="contact-btn">Get in Touch</a>
+    </section>
+
+    <footer>
+        <span>&copy; 2026 Michael Falkson</span>
+        <div class="footer-links"><a href="#">Instagram</a><a href="#">Email</a></div>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 50));
+
+        async function load() {
+            try {
+                const res = await fetch('/api/gallery');
+                const items = await res.json();
+                items.sort((a,b) => a.order - b.order);
+                const grid = document.getElementById('gallery-grid');
+                if (items.length > 0) {
+                    // Use first image as hero
+                    document.getElementById('hero-image').innerHTML = `<img src="images/${items[0].filename}" alt="${items[0].title}">`;
+                    grid.innerHTML = items.map((item, i) => `
+                        <div class="gallery-item">
+                            <img src="images/thumbs/${item.filename}" alt="${item.title}" loading="lazy">
+                            <div class="gallery-info"><h3>${item.title}</h3><p>${item.material}</p></div>
+                        </div>
+                    `).join('');
+                } else {
+                    const shapes = ['&#9670;','&#9674;','&#9651;','&#9671;','&#9675;','&#9645;'];
+                    const classes = ['', 'wide', '', 'square', '', ''];
+                    grid.innerHTML = shapes.map((s,i) => `
+                        <div class="gallery-item">
+                            <div class="tile-placeholder ${classes[i]}">${s}</div>
+                            <div class="gallery-info"><h3>Sculpture ${i+1}</h3><p>Metal</p></div>
+                        </div>
+                    `).join('');
+                }
+                const aboutRes = await fetch('/api/about');
+                const about = await aboutRes.json();
+                if (about.artistPhoto) {
+                    document.getElementById('about-image').innerHTML = `<img src="images/${about.artistPhoto}" alt="Artist">`;
+                }
+            } catch {
+                const shapes = ['&#9670;','&#9674;','&#9651;','&#9671;','&#9675;','&#9645;'];
+                const classes = ['', 'wide', '', 'square', '', ''];
+                document.getElementById('gallery-grid').innerHTML = shapes.map((s,i) => `
+                    <div class="gallery-item">
+                        <div class="tile-placeholder ${classes[i]}">${s}</div>
+                        <div class="gallery-info"><h3>Sculpture ${i+1}</h3><p>Metal</p></div>
+                    </div>
+                `).join('');
+            }
+        }
+        load();
+    </script>
+</body>
+</html>
